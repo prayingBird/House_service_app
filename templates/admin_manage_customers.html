@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Customers{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4 text-primary">Manage Customers</h2>
+    <p class="text-center mb-4">Here you can view and manage all registered customers.</p>
+
+    <div class="list-group">
+        {% for customer in customers %}
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1"><strong>{{ customer.username }}</strong></h5>
+                <p class="mb-1"><strong>Email:</strong> {{ customer.email }}</p>
+                <p class="mb-0"><strong>Status:</strong> <span class="badge {% if customer.status == 'Blocked' %}bg-danger{% else %}bg-success{% endif %}">{{ customer.status }}</span></p>
+            </div>
+
+            <div class="d-flex align-items-center">
+                {% if customer.status == 'Blocked' %}
+                <form action="{{ url_for('admin_unblock_user', user_id=customer.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-success btn-sm ms-2" title="Unblock this user">
+                        <i class="bi bi-unlock"></i> Unblock
+                    </button>
+                </form>
+                {% else %}
+                <form action="{{ url_for('admin_block_user', user_id=customer.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm ms-2" title="Block this user">
+                        <i class="bi bi-lock"></i> Block
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="list-group-item text-center">No customers found.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

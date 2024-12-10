@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Service Request{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Edit Service Request</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="form-group mb-3">
+                    <label for="remarks" class="font-weight-bold">Remarks</label>
+                    <textarea class="form-control" id="remarks" name="remarks" rows="3" required>{{ request.remarks }}</textarea>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="status" class="font-weight-bold">Status</label>
+                    <select class="form-control" id="status" name="status" required>
+                        <option value="Requested" {% if request.status == 'Requested' %}selected{% endif %}>Requested</option>
+                        <option value="Assigned" {% if request.status == 'Assigned' %}selected{% endif %}>Assigned</option>
+                        <option value="Closed" {% if request.status == 'Closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Update Request</button>
+            </form>
+
+            {% if message %}
+                <div class="alert alert-info mt-3">{{ message }}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

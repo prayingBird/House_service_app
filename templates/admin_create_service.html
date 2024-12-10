@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Service{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Create New Service</h2>
+    <form method="POST" class="p-4 rounded shadow-sm bg-white">
+        <div class="form-group mb-3">
+            <label for="name" class="form-label">Service Name <span class="text-danger">*</span></label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="name" 
+                name="name" 
+                placeholder="Enter service name" 
+                required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea 
+                class="form-control" 
+                id="description" 
+                name="description" 
+                rows="3" 
+                placeholder="Enter service description"></textarea>
+        </div>
+        <div class="form-group mb-3">
+            <label for="price" class="form-label">Base Price <span class="text-danger">*</span></label>
+            <input 
+                type="number" 
+                class="form-control" 
+                id="price" 
+                name="price" 
+                placeholder="Enter base price" 
+                required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="time_required" class="form-label">Time Required</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="time_required" 
+                name="time_required" 
+                placeholder="E.g., 2 hours">
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg w-100">Create Service</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

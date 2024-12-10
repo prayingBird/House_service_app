@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Services{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Manage Services</h2>
+    <p class="text-center">View, edit, and delete services listed on the platform.</p>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-info text-white">
+            <h4 class="card-title mb-0">Service List</h4>
+        </div>
+        <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+                {% for service in services %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <!-- Service Details -->
+                        <div>
+                            <strong>Name:</strong> {{ service.name }}<br>
+                            <strong>Description:</strong> {{ service.description }}<br>
+                            <strong>Price:</strong> ${{ service.price }}<br>
+                            <strong>Time Required:</strong> {{ service.time_required }}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex align-items-start flex-column">
+                            <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-warning btn-sm mb-2">Edit</a>
+                            <form action="{{ url_for('delete_service', service_id=service.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item text-center">No services available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Customer Dashboard</h2>
+    <p>Welcome to your dashboard. Here you can browse and request services.</p>
+
+    <!-- Service Cards Row -->
+    <div class="row">
+        {% for service in services %}
+        <div class="col-md-4 col-sm-6 col-12 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <p class="card-title"><strong>Service Type:</strong> {{ service.name }}</p>
+                    <p class="card-text"><strong>Provided by:</strong> {{ service.provider.username }}</p>
+                    <p class="card-text"><strong>Description:</strong> {{ service.description }}</p>
+                    <p class="card-text"><strong>Address:</strong> {{ service.provider.address }}</p>
+                    <p class="card-text"><strong>Price:</strong> ${{ service.price }}</p>
+                    <p class="card-text"><strong>Time Required:</strong> {{ service.time_required or 'To be determined' }}</p>
+                    <div class="mt-auto">
+                        {% set can_request = true %}
+                        {% for request in active_requests %}
+                            {% if request.service_id == service.id and request.status != 'Declined' %}
+                                {% set can_request = false %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if can_request %}
+                        <form action="{{ url_for('create_service_request', service_id=service.id) }}" method="post" onsubmit="return confirmRequest();">
+                            <button type="submit" class="btn btn-primary w-100">Request Service</button>
+                        </form>
+                        {% else %}
+                        <button class="btn btn-secondary w-100" disabled>Requested</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Active Requests Section -->
+    <h3 class="mt-5">Your Service Requests</h3>
+    <ul class="list-group mb-4">
+        {% for request in active_requests %}
+        <li class="list-group-item">
+            <strong>{{ request.service.name }}</strong> - Status: {{ request.status }}
+            <br>
+            <strong>Requested on:</strong> {{ request.request_date.strftime('%Y-%m-%d') }}
+            <br>
+            <strong>Professional:</strong> {{ request.professional.username if request.professional else 'N/A' }}
+            {% if request.status == 'Declined' %}
+            <p class="text-danger mt-2">This request has been declined by the professional.</p>
+            {% endif %}
+        </li>
+        {% else %}
+        <li class="list-group-item">No active service requests found.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Completed Requests Section -->
+    <h3 class="mt-5">Completed Requests</h3>
+    <ul class="list-group mb-4">
+        {% for request in completed_requests %}
+        <li class="list-group-item">
+            <strong>{{ request.service.name }}</strong> - Completed on {{ request.completion_date.strftime('%Y-%m-%d') }}
+            <br>
+            <strong>Completed by:</strong> {{ request.professional.username }}
+            {% if not request.has_feedback %}
+            <form action="{{ url_for('submit_feedback', request_id=request.id) }}" method="POST" class="mt-2">
+                <textarea name="feedback" class="form-control mb-2" placeholder="Enter your feedback" required></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">Submit Feedback</button>
+            </form>
+            {% else %}
+            <p class="mt-2 text-success">Feedback submitted. Thank you!</p>
+            {% endif %}
+        </li>
+        {% else %}
+        <li class="list-group-item">No completed requests yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Modal for Confirming Service Request -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmModalLabel">Confirm Service Request</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to request this service?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" id="confirmYes">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    let formToSubmit;
+
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            if (form.querySelector('textarea')) return; // Skip feedback forms
+            event.preventDefault();
+            formToSubmit = form;
+            confirmModal.show();
+        });
+    });
+
+    document.getElementById('confirmYes').addEventListener('click', function() {
+        const button = formToSubmit.querySelector('button[type="submit"]');
+        button.textContent = 'Requesting...';
+        button.disabled = true;
+        formToSubmit.submit();
+    });
+});
+</script>
+
+{% endblock %}

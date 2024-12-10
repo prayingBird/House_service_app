@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Professional Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Professional Dashboard</h3>
+        </div>
+        <div class="card-body">
+            <p>Welcome to your dashboard. Here you can view all service requests assigned to you.</p>
+
+            <!-- New Requested Services -->
+            <h4>New Requested Services</h4>
+            <ul class="list-group mb-4">
+                {% for request in new_requests %}
+                {% if request.status == 'Requested' %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Service:</strong> {{ request.service.name }}<br>
+                            <strong>Customer:</strong> {{ request.customer.username }}<br>
+                            <strong>Status:</strong> {{ request.status }}<br>
+                            <strong>Request Date:</strong> {{ request.request_date.strftime('%Y-%m-%d') }}
+                        </div>
+                        <div>
+                            <form action="{{ url_for('update_service_request', request_id=request.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                            </form>
+                            <form action="{{ url_for('decline_service_request', request_id=request.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+                {% endif %}
+                {% else %}
+                <li class="list-group-item text-center">No new service requests found.</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Ongoing Services -->
+            <h4>Ongoing Services</h4>
+            <ul class="list-group mb-4">
+                {% for request in new_requests %}
+                {% if request.status == 'Ongoing' %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Service:</strong> {{ request.service.name }}<br>
+                            <strong>Customer:</strong> {{ request.customer.username }}<br>
+                            <strong>Status:</strong> {{ request.status }}<br>
+                            <strong>Request Date:</strong> {{ request.request_date.strftime('%Y-%m-%d') }}
+                        </div>
+                        <div>
+                            <form action="{{ url_for('update_service_request', request_id=request.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">Mark as Completed</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+                {% endif %}
+                {% else %}
+                <li class="list-group-item text-center">No ongoing services found.</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Completed Services with Feedback -->
+            <h4>Completed Services</h4>
+            <ul class="list-group mb-4">
+                {% for request in completed_requests %}
+                <li class="list-group-item">
+                    <div>
+                        <strong>Service:</strong> {{ request.service.name }}<br>
+                        <strong>Customer:</strong> {{ request.customer.username }}<br>
+                        <strong>Status:</strong> {{ request.status }}<br>
+                        <strong>Completion Date:</strong> {{ request.completion_date.strftime('%Y-%m-%d') }}
+                    </div>
+                    {% if request.feedbacks %}
+                    <div class="mt-2">
+                        <h5>Feedback:</h5>
+                        <ul>
+                            {% for feedback in request.feedbacks %}
+                            <li>{{ feedback.content }} - <small>{{ feedback.created_at.strftime('%Y-%m-%d') }}</small></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="list-group-item text-center">No completed services found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Professionals{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Manage Professionals</h2>
+    <p class="text-center">View and manage all registered professionals from this dashboard.</p>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white">
+            <h4 class="card-title mb-0">Professional List</h4>
+        </div>
+        <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+                {% for professional in professionals %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Professional Details -->
+                        <div>
+                            <strong>Username:</strong> {{ professional.username }}<br>
+                            <strong>Email:</strong> {{ professional.email }}<br>
+                            <strong>Status:</strong> 
+                            {% if professional.status == 'Blocked' %}
+                                <span class="badge bg-danger">{{ professional.status }}</span>
+                            {% else %}
+                                <span class="badge bg-success">{{ professional.status }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div>
+                            {% if professional.status == 'Blocked' %}
+                            <form action="{{ url_for('admin_unblock_user', user_id=professional.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">Unblock</button>
+                            </form>
+                            {% else %}
+                            <form action="{{ url_for('admin_block_user', user_id=professional.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">Block</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item text-center">No professionals found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

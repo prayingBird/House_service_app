@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Admin Dashboard</h2>
+    <p class="text-center">Welcome to the admin dashboard. Here you can manage services, pending approvals, customers, and professionals efficiently.</p>
+
+    <div class="row my-4">
+        <!-- Manage Users -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Manage Users</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a href="{{ url_for('admin_manage_customers') }}" class="btn btn-outline-primary w-100">Manage Customers</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{{ url_for('admin_manage_professionals') }}" class="btn btn-outline-primary w-100">Manage Professionals</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Services -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title mb-0">Manage Services</h3>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('create_service') }}" class="btn btn-primary mb-3">Create New Service</a>
+                    <ul class="list-group list-group-flush">
+                        {% for service in services %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ service.name }}</strong><br>
+                                    <small class="text-muted">Professional: {{ service.provider.username }}</small>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-warning btn-sm mx-1">Edit</a>
+                                    <form action="{{ url_for('delete_service', service_id=service.id) }}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item text-center">No approved services available.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Services for Approval -->
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-warning text-dark">
+            <h3 class="card-title mb-0">Pending Services for Approval</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for pending_service in pending_services %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ pending_service.name }}</strong> - <small class="text-muted">{{ pending_service.description }}</small><br>
+                            <small class="text-muted">Professional: {{ pending_service.provider.username }}</small>
+                        </div>
+                        <div>
+                            <form action="{{ url_for('approve_service', pending_service_id=pending_service.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-success btn-sm mx-1">Approve</button>
+                            </form>
+                            <form action="{{ url_for('delete_pending_service', pending_service_id=pending_service.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm mx-1">Decline</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item text-center">No pending services for approval.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Feedback Section -->
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-info text-white">
+            <h3 class="card-title mb-0">Customer Feedback</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for feedback in feedbacks %}
+                <li class="list-group-item">
+                    <div>
+                        {% if feedback.service_request and feedback.service_request.service %}
+                            <strong>Service:</strong> {{ feedback.service_request.service.name }}<br>
+                            <strong>Customer:</strong> {{ feedback.service_request.customer.username }}<br>
+                            <strong>Professional:</strong> {{ feedback.service_request.professional.username }}<br>
+                        {% else %}
+                            <strong>Service:</strong> <em>Service request not found</em><br>
+                        {% endif %}
+                        <strong>Feedback:</strong> {{ feedback.content }}<br>
+                        <small class="text-muted">Submitted on {{ feedback.created_at.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item text-center">No feedback available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
